@@ -77,8 +77,8 @@ type floatMultiShardBatchCursor struct {
 	itrs   tsdb.CursorIterators
 	req    *tsdb.CursorRequest
 	err    error
-	limit  uint64
-	count  uint64
+	limit  int64
+	count  int64
 }
 
 func newFloatMultiShardBatchCursor(ctx context.Context, cur tsdb.FloatBatchCursor, rr *readRequest, req *tsdb.CursorRequest, itrs tsdb.CursorIterators, cond expression) *floatMultiShardBatchCursor {
@@ -89,13 +89,18 @@ func newFloatMultiShardBatchCursor(ctx context.Context, cur tsdb.FloatBatchCurso
 		cur = filter
 	}
 
+	lim := rr.limit
+	if lim < 0 {
+		lim = 1
+	}
+
 	c := &floatMultiShardBatchCursor{
 		FloatBatchCursor: cur,
 		ctx:              ctx,
 		filter:           filter,
 		req:              req,
 		itrs:             itrs,
-		limit:            rr.limit,
+		limit:            lim,
 	}
 
 	return c
@@ -111,11 +116,11 @@ func (c *floatMultiShardBatchCursor) Next() (key []int64, value []float64) {
 				continue
 			}
 		}
-		c.count += uint64(len(ks))
+		c.count += int64(len(ks))
 		if c.count > c.limit {
 			diff := c.count - c.limit
 			c.count -= diff
-			rem := uint64(len(ks)) - diff
+			rem := int64(len(ks)) - diff
 			ks = ks[:rem]
 			vs = vs[:rem]
 		}
@@ -281,8 +286,8 @@ type integerMultiShardBatchCursor struct {
 	itrs   tsdb.CursorIterators
 	req    *tsdb.CursorRequest
 	err    error
-	limit  uint64
-	count  uint64
+	limit  int64
+	count  int64
 }
 
 func newIntegerMultiShardBatchCursor(ctx context.Context, cur tsdb.IntegerBatchCursor, rr *readRequest, req *tsdb.CursorRequest, itrs tsdb.CursorIterators, cond expression) *integerMultiShardBatchCursor {
@@ -293,13 +298,18 @@ func newIntegerMultiShardBatchCursor(ctx context.Context, cur tsdb.IntegerBatchC
 		cur = filter
 	}
 
+	lim := rr.limit
+	if lim < 0 {
+		lim = 1
+	}
+
 	c := &integerMultiShardBatchCursor{
 		IntegerBatchCursor: cur,
 		ctx:                ctx,
 		filter:             filter,
 		req:                req,
 		itrs:               itrs,
-		limit:              rr.limit,
+		limit:              lim,
 	}
 
 	return c
@@ -315,11 +325,11 @@ func (c *integerMultiShardBatchCursor) Next() (key []int64, value []int64) {
 				continue
 			}
 		}
-		c.count += uint64(len(ks))
+		c.count += int64(len(ks))
 		if c.count > c.limit {
 			diff := c.count - c.limit
 			c.count -= diff
-			rem := uint64(len(ks)) - diff
+			rem := int64(len(ks)) - diff
 			ks = ks[:rem]
 			vs = vs[:rem]
 		}
@@ -485,8 +495,8 @@ type unsignedMultiShardBatchCursor struct {
 	itrs   tsdb.CursorIterators
 	req    *tsdb.CursorRequest
 	err    error
-	limit  uint64
-	count  uint64
+	limit  int64
+	count  int64
 }
 
 func newUnsignedMultiShardBatchCursor(ctx context.Context, cur tsdb.UnsignedBatchCursor, rr *readRequest, req *tsdb.CursorRequest, itrs tsdb.CursorIterators, cond expression) *unsignedMultiShardBatchCursor {
@@ -497,13 +507,18 @@ func newUnsignedMultiShardBatchCursor(ctx context.Context, cur tsdb.UnsignedBatc
 		cur = filter
 	}
 
+	lim := rr.limit
+	if lim < 0 {
+		lim = 1
+	}
+
 	c := &unsignedMultiShardBatchCursor{
 		UnsignedBatchCursor: cur,
 		ctx:                 ctx,
 		filter:              filter,
 		req:                 req,
 		itrs:                itrs,
-		limit:               rr.limit,
+		limit:               lim,
 	}
 
 	return c
@@ -519,11 +534,11 @@ func (c *unsignedMultiShardBatchCursor) Next() (key []int64, value []uint64) {
 				continue
 			}
 		}
-		c.count += uint64(len(ks))
+		c.count += int64(len(ks))
 		if c.count > c.limit {
 			diff := c.count - c.limit
 			c.count -= diff
-			rem := uint64(len(ks)) - diff
+			rem := int64(len(ks)) - diff
 			ks = ks[:rem]
 			vs = vs[:rem]
 		}
@@ -689,8 +704,8 @@ type stringMultiShardBatchCursor struct {
 	itrs   tsdb.CursorIterators
 	req    *tsdb.CursorRequest
 	err    error
-	limit  uint64
-	count  uint64
+	limit  int64
+	count  int64
 }
 
 func newStringMultiShardBatchCursor(ctx context.Context, cur tsdb.StringBatchCursor, rr *readRequest, req *tsdb.CursorRequest, itrs tsdb.CursorIterators, cond expression) *stringMultiShardBatchCursor {
@@ -701,13 +716,18 @@ func newStringMultiShardBatchCursor(ctx context.Context, cur tsdb.StringBatchCur
 		cur = filter
 	}
 
+	lim := rr.limit
+	if lim < 0 {
+		lim = 1
+	}
+
 	c := &stringMultiShardBatchCursor{
 		StringBatchCursor: cur,
 		ctx:               ctx,
 		filter:            filter,
 		req:               req,
 		itrs:              itrs,
-		limit:             rr.limit,
+		limit:             lim,
 	}
 
 	return c
@@ -723,11 +743,11 @@ func (c *stringMultiShardBatchCursor) Next() (key []int64, value []string) {
 				continue
 			}
 		}
-		c.count += uint64(len(ks))
+		c.count += int64(len(ks))
 		if c.count > c.limit {
 			diff := c.count - c.limit
 			c.count -= diff
-			rem := uint64(len(ks)) - diff
+			rem := int64(len(ks)) - diff
 			ks = ks[:rem]
 			vs = vs[:rem]
 		}
@@ -865,8 +885,8 @@ type booleanMultiShardBatchCursor struct {
 	itrs   tsdb.CursorIterators
 	req    *tsdb.CursorRequest
 	err    error
-	limit  uint64
-	count  uint64
+	limit  int64
+	count  int64
 }
 
 func newBooleanMultiShardBatchCursor(ctx context.Context, cur tsdb.BooleanBatchCursor, rr *readRequest, req *tsdb.CursorRequest, itrs tsdb.CursorIterators, cond expression) *booleanMultiShardBatchCursor {
@@ -877,13 +897,18 @@ func newBooleanMultiShardBatchCursor(ctx context.Context, cur tsdb.BooleanBatchC
 		cur = filter
 	}
 
+	lim := rr.limit
+	if lim < 0 {
+		lim = 1
+	}
+
 	c := &booleanMultiShardBatchCursor{
 		BooleanBatchCursor: cur,
 		ctx:                ctx,
 		filter:             filter,
 		req:                req,
 		itrs:               itrs,
-		limit:              rr.limit,
+		limit:              lim,
 	}
 
 	return c
@@ -899,11 +924,11 @@ func (c *booleanMultiShardBatchCursor) Next() (key []int64, value []bool) {
 				continue
 			}
 		}
-		c.count += uint64(len(ks))
+		c.count += int64(len(ks))
 		if c.count > c.limit {
 			diff := c.count - c.limit
 			c.count -= diff
-			rem := uint64(len(ks)) - diff
+			rem := int64(len(ks)) - diff
 			ks = ks[:rem]
 			vs = vs[:rem]
 		}

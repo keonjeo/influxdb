@@ -73,8 +73,8 @@ type {{.name}}MultiShardBatchCursor struct {
 	itrs   tsdb.CursorIterators
 	req    *tsdb.CursorRequest
 	err    error
-	limit  uint64
-	count  uint64
+	limit  int64
+	count  int64
 }
 
 func new{{.Name}}MultiShardBatchCursor(ctx context.Context, cur tsdb.{{.Name}}BatchCursor, rr *readRequest, req *tsdb.CursorRequest, itrs tsdb.CursorIterators, cond expression) *{{.name}}MultiShardBatchCursor {
@@ -85,13 +85,18 @@ func new{{.Name}}MultiShardBatchCursor(ctx context.Context, cur tsdb.{{.Name}}Ba
 		cur = filter
 	}
 
+	lim := rr.limit
+	if lim < 0 {
+		lim = 1
+	}
+
 	c := &{{.name}}MultiShardBatchCursor{
 		{{.Name}}BatchCursor: cur,
 		ctx:    ctx,
 		filter: filter,
 		req:    req,
 		itrs:   itrs,
-		limit:  rr.limit,
+		limit:  lim,
 	}
 
 	return c
@@ -107,11 +112,11 @@ func (c *{{.name}}MultiShardBatchCursor) Next() (key []int64, value []{{.Type}})
 				continue
 			}
 		}
-		c.count += uint64(len(ks))
+		c.count += int64(len(ks))
 		if c.count > c.limit {
 			diff := c.count - c.limit
 			c.count -= diff
-			rem := uint64(len(ks)) - diff
+			rem := int64(len(ks)) - diff
 			ks = ks[:rem]
 			vs = vs[:rem]
 		}

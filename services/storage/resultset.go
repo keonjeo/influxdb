@@ -11,7 +11,7 @@ type readRequest struct {
 	ctx        context.Context
 	start, end int64
 	asc        bool
-	limit      uint64
+	limit      int64
 	aggregate  *Aggregate
 }
 

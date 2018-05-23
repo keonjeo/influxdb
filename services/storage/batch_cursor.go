@@ -66,7 +66,7 @@ func newMultiShardBatchCursor(ctx context.Context, row seriesRow, rr *readReques
 	req := &tsdb.CursorRequest{
 		Name:      row.name,
 		Tags:      row.stags,
-		Field:     row.field,
+		Field:     row.field.n,
 		Ascending: rr.asc,
 		StartTime: rr.start,
 		EndTime:   rr.end,

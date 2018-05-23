@@ -30,6 +30,20 @@ func (w *responseWriter) putFloatPointsFrame(f *ReadResponse_Frame_FloatPoints) 
 	w.buffer.Float = append(w.buffer.Float, f)
 }
 
+func (w *responseWriter) streamFloatSeries(cur tsdb.FloatBatchCursor) {
+	w.sf.DataType = DataTypeFloat
+	ss := len(w.res.Frames) - 1
+	ts, _ := cur.Next()
+	cur.Close()
+	if len(ts) == 0 {
+		w.sz -= w.sf.Size()
+		w.putSeriesFrame(w.res.Frames[ss].Data.(*ReadResponse_Frame_Series))
+		w.res.Frames = w.res.Frames[:ss]
+	} else if w.sz > writeSize {
+		w.flushFrames()
+	}
+}
+
 func (w *responseWriter) streamFloatPoints(cur tsdb.FloatBatchCursor) {
 	w.sf.DataType = DataTypeFloat
 	ss := len(w.res.Frames) - 1
@@ -100,6 +114,20 @@ func (w *responseWriter) putIntegerPointsFrame(f *ReadResponse_Frame_IntegerPoin
 	f.IntegerPoints.Timestamps = f.IntegerPoints.Timestamps[:0]
 	f.IntegerPoints.Values = f.IntegerPoints.Values[:0]
 	w.buffer.Integer = append(w.buffer.Integer, f)
+}
+
+func (w *responseWriter) streamIntegerSeries(cur tsdb.IntegerBatchCursor) {
+	w.sf.DataType = DataTypeInteger
+	ss := len(w.res.Frames) - 1
+	ts, _ := cur.Next()
+	cur.Close()
+	if len(ts) == 0 {
+		w.sz -= w.sf.Size()
+		w.putSeriesFrame(w.res.Frames[ss].Data.(*ReadResponse_Frame_Series))
+		w.res.Frames = w.res.Frames[:ss]
+	} else if w.sz > writeSize {
+		w.flushFrames()
+	}
 }
 
 func (w *responseWriter) streamIntegerPoints(cur tsdb.IntegerBatchCursor) {
@@ -174,6 +202,20 @@ func (w *responseWriter) putUnsignedPointsFrame(f *ReadResponse_Frame_UnsignedPo
 	w.buffer.Unsigned = append(w.buffer.Unsigned, f)
 }
 
+func (w *responseWriter) streamUnsignedSeries(cur tsdb.UnsignedBatchCursor) {
+	w.sf.DataType = DataTypeUnsigned
+	ss := len(w.res.Frames) - 1
+	ts, _ := cur.Next()
+	cur.Close()
+	if len(ts) == 0 {
+		w.sz -= w.sf.Size()
+		w.putSeriesFrame(w.res.Frames[ss].Data.(*ReadResponse_Frame_Series))
+		w.res.Frames = w.res.Frames[:ss]
+	} else if w.sz > writeSize {
+		w.flushFrames()
+	}
+}
+
 func (w *responseWriter) streamUnsignedPoints(cur tsdb.UnsignedBatchCursor) {
 	w.sf.DataType = DataTypeUnsigned
 	ss := len(w.res.Frames) - 1
@@ -246,6 +288,20 @@ func (w *responseWriter) putStringPointsFrame(f *ReadResponse_Frame_StringPoints
 	w.buffer.String = append(w.buffer.String, f)
 }
 
+func (w *responseWriter) streamStringSeries(cur tsdb.StringBatchCursor) {
+	w.sf.DataType = DataTypeString
+	ss := len(w.res.Frames) - 1
+	ts, _ := cur.Next()
+	cur.Close()
+	if len(ts) == 0 {
+		w.sz -= w.sf.Size()
+		w.putSeriesFrame(w.res.Frames[ss].Data.(*ReadResponse_Frame_Series))
+		w.res.Frames = w.res.Frames[:ss]
+	} else if w.sz > writeSize {
+		w.flushFrames()
+	}
+}
+
 func (w *responseWriter) streamStringPoints(cur tsdb.StringBatchCursor) {
 	w.sf.DataType = DataTypeString
 	ss := len(w.res.Frames) - 1
@@ -316,6 +372,20 @@ func (w *responseWriter) putBooleanPointsFrame(f *ReadResponse_Frame_BooleanPoin
 	f.BooleanPoints.Timestamps = f.BooleanPoints.Timestamps[:0]
 	f.BooleanPoints.Values = f.BooleanPoints.Values[:0]
 	w.buffer.Boolean = append(w.buffer.Boolean, f)
+}
+
+func (w *responseWriter) streamBooleanSeries(cur tsdb.BooleanBatchCursor) {
+	w.sf.DataType = DataTypeBoolean
+	ss := len(w.res.Frames) - 1
+	ts, _ := cur.Next()
+	cur.Close()
+	if len(ts) == 0 {
+		w.sz -= w.sf.Size()
+		w.putSeriesFrame(w.res.Frames[ss].Data.(*ReadResponse_Frame_Series))
+		w.res.Frames = w.res.Frames[:ss]
+	} else if w.sz > writeSize {
+		w.flushFrames()
+	}
 }
 
 func (w *responseWriter) streamBooleanPoints(cur tsdb.BooleanBatchCursor) {
